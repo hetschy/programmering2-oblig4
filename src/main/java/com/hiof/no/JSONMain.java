@@ -35,11 +35,13 @@ public class JSONMain {
 		los.add(peakyBlinders);
 		los.add(test);
 
-		json.addListOfTVSeries(los);
+		json.addListOfTVSeries(los); // Oppgave 2.4c)
 
-		for (TVSeries serie : json.getAllTVSeries()) {
+		for (TVSeries serie : json.getAllTVSeries()) { // Oppgave 2.4d)
 			System.out.println(serie);
 		}
+
+		System.out.println(json.getTVSeriesByTitle("Peaky Blinders")); // Oppgave 2.4e)
 
 	}
 }

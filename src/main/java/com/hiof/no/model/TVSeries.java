@@ -124,7 +124,8 @@ public class TVSeries {
 		return "TV series title: " + title +
 				"\nDescription: " + description +
 				"\nRelease date: "
-				+ DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).format(releaseDate);
+				+ DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).format(releaseDate) +
+				"\nNumber of episodes: " + episodes.size();
 	}
 
 	public ArrayList<Episode> getEpisodes() {
