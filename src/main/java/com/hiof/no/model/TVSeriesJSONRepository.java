@@ -3,14 +3,11 @@ package com.hiof.no.model;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -27,7 +24,7 @@ public class TVSeriesJSONRepository implements TVSeriesRepository {
 		mapper.registerModule(new JavaTimeModule());
 		try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
 			for (TVSeries serie : listOfTVSeries) {
-				bufferedWriter.append(mapper.writeValueAsString(serie));
+				bufferedWriter.append(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(serie));
 				bufferedWriter.newLine();
 			}
 		} catch (IOException e) {
@@ -47,10 +44,6 @@ public class TVSeriesJSONRepository implements TVSeriesRepository {
 			while ((line = bufferedReader.readLine()) != null) {
 				listOfTVSeries.add(mapper.readValue(line, TVSeries.class));
 			}
-		} catch (JsonMappingException e) {
-			System.err.println("Cannot map contents of JSON");
-		} catch (JsonProcessingException e) {
-			System.err.println("Error parsing JSON");
 		} catch (IOException e) {
 			System.err.println("I/O-exception encountered");
 		}
@@ -75,11 +68,10 @@ public class TVSeriesJSONRepository implements TVSeriesRepository {
 				}
 			}
 
-		} catch (FileNotFoundException e) {
-			System.err.println("File could not be found");
 		} catch (IOException e) {
 			System.err.println("File could not be opened");
 		}
+
 		return null;
 	}
 
