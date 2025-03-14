@@ -9,6 +9,11 @@
 *.nar
 *.csv
 *.json
+*.aux
+*.fls
+*.gz
+*.tex
+*.fdb_latexmk
 hs_err_pid*
 replay_pid*
 

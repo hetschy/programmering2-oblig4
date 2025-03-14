@@ -1,14 +1,12 @@
 package com.hiof.no.model;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.ExceptionUtil;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class TVSeriesJSONRepository implements TVSeriesRepository {
@@ -22,11 +20,8 @@ public class TVSeriesJSONRepository implements TVSeriesRepository {
 	public void addListOfTVSeries(ArrayList<TVSeries> listOfTVSeries) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new JavaTimeModule());
-		try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
-			for (TVSeries serie : listOfTVSeries) {
-				bufferedWriter.append(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(serie));
-				bufferedWriter.newLine();
-			}
+		try {
+			mapper.writerWithDefaultPrettyPrinter().writeValue(file, listOfTVSeries);
 		} catch (IOException e) {
 			System.err.println(e);
 		}
@@ -34,45 +29,35 @@ public class TVSeriesJSONRepository implements TVSeriesRepository {
 
 	@Override
 	public ArrayList<TVSeries> getAllTVSeries() {
-		ArrayList<TVSeries> listOfTVSeries = new ArrayList<>();
 
-		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.registerModule(new JavaTimeModule());
-			String line;
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new JavaTimeModule());
 
-			while ((line = bufferedReader.readLine()) != null) {
-				listOfTVSeries.add(mapper.readValue(line, TVSeries.class));
-			}
+		try {
+			TVSeries[] tvSeriesArray = mapper.readValue(file, TVSeries[].class);
+			return new ArrayList<>(Arrays.asList(tvSeriesArray));
 		} catch (IOException e) {
-			System.err.println("I/O-exception encountered");
+			System.err.println(e);
 		}
+		return new ArrayList<>();
 
-		return listOfTVSeries;
 	}
 
 	@Override
 	public TVSeries getTVSeriesByTitle(String title) {
-		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-
+		try {
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.registerModule(new JavaTimeModule());
 
-			String line;
-			while ((line = bufferedReader.readLine()) != null) {
-				String cTitle = mapper.readValue(line, TVSeries.class).getTitle();
-				if (cTitle.equals(title)) {
-					return new TVSeries(cTitle,
-							mapper.readValue(line, TVSeries.class).getDescription(),
-							mapper.readValue(line, TVSeries.class).getReleaseDate());
+			TVSeries[] tvSeriesArray = mapper.readValue(file, TVSeries[].class);
+			for (TVSeries serie : Arrays.asList(tvSeriesArray)) {
+				if (serie.getTitle().equals(title)) {
+					return serie;
 				}
 			}
-
 		} catch (IOException e) {
-			System.err.println("File could not be opened");
+			System.err.println(e);
 		}
-
 		return null;
 	}
-
 }
